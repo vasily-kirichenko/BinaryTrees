@@ -1,6 +1,7 @@
 ﻿open System
 open System.Linq
 open System.Diagnostics
+open System.Threading.Tasks
 
 [<Struct>]
 type Tree = { Next: Next }
@@ -23,16 +24,7 @@ let rec bottomUpTree (depth: int) =
         { Next = Unchecked.defaultof<_> } 
 
 let inner (depth: int) (iterations: int) =
-    if depth > 18 then
-        [ 1..iterations ]
-            .AsParallel()
-            .Select(fun _ -> check (bottomUpTree depth))
-            .Sum()
-    else
-        let mutable sum = 0
-        for _ in 1..iterations do
-            sum <- sum + check (bottomUpTree depth)
-        sum
+    Array.init iterations (fun _ -> check (bottomUpTree depth)) |> Array.sum
     |> sprintf "%d\t trees of depth %d\t check: %d" iterations depth
     
 [<EntryPoint>]
