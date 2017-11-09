@@ -3,6 +3,14 @@
 This is [Binary Trees benchmark](http://benchmarksgame.alioth.debian.org/u64q/program.php?test=binarytrees&lang=fsharpcore&id=3)
 modified so it's closer to the Java version.
 
+It allocates ~300M objects
+
+![image](https://user-images.githubusercontent.com/873919/32607347-ba8c01b8-c569-11e7-99f0-174e157bd91f.png)
+
+And it spends almost all the time allocating and GC-ing
+
+![image](https://user-images.githubusercontent.com/873919/32607550-6b61529a-c56a-11e7-9491-e07dc628827b.png)
+
 Output on Core i7-6700 Windows 10 machine, .NET Core 2.0
 ```
 stretch tree of depth 22         check: 8388607
