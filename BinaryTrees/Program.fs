@@ -1,61 +1,47 @@
 ﻿open System
+open System.Threading
 open System.Linq
 open System.Diagnostics
 open System.Threading.Tasks
 
-[<Struct>]
-type Tree = { Next: Next }
-and Next = { 
-    Left: Tree 
-    Right: Tree }
+[<Sealed; AllowNullLiteral>]
+type TreeNode(left: TreeNode, right: TreeNode) =
+    member this.itemCheck() = if isNull left then 1 else 1 + left.itemCheck() + right.itemCheck()
 
-let rec check (tree: Tree) =
-    if isNull (box tree.Next) then
-        1
-    else 
-        1 + check(tree.Next.Right) + check(tree.Next.Left)
+let empty = TreeNode(null, null)
 
-let rec bottomUpTree (depth: int) =
+let MIN_DEPTH = 4
+
+let rec bottomUpTree(depth: int) : TreeNode =
     if depth > 0 then
-        { Next = 
-            { Left = bottomUpTree (depth - 1)
-              Right = bottomUpTree (depth - 1) }}
-    else 
-        { Next = Unchecked.defaultof<_> } 
+        TreeNode(bottomUpTree(depth - 1), bottomUpTree(depth - 1))
+    else
+        empty
 
-let inner (depth: int) (iterations: int) =
-    Array.init iterations (fun _ -> check (bottomUpTree depth)) |> Array.sum
-    |> sprintf "%d\t trees of depth %d\t check: %d" iterations depth
-    
 [<EntryPoint>]
 let main args =
     let sw = Stopwatch.StartNew()
-    let minDepth = 4
-    let maxDepth =
-        let n = match args with [|x|] -> int x | _ -> 10
-        if minDepth + 2 > n then minDepth + 2 else n
-    (
-        let depth = maxDepth + 1
-        let c = check (bottomUpTree depth)
-        printfn "stretch tree of depth %d\t check: %d" depth c
-    )
-    
+    let n = match args with [|n|] -> int n | _ -> 0
+    let maxDepth = if n < MIN_DEPTH + 2 then MIN_DEPTH + 2 else n
+    let stretchDepth = maxDepth + 1
+
+    printfn "stretch tree of depth %d\t check: %d" stretchDepth (bottomUpTree(stretchDepth).itemCheck())
+
     let longLivedTree = bottomUpTree maxDepth
-    
-    let messages =
-        [| for halfDepth in minDepth/2..maxDepth/2 do
+
+    let results =
+        [| for depth in MIN_DEPTH..2..maxDepth do
              yield async {
-                let depth = halfDepth * 2
-                let iterations = 1 <<< (maxDepth - depth + minDepth)
-                let result = inner depth iterations
-                return result
-             } 
-        |]
+                let iterations = 1 <<< (maxDepth - depth + MIN_DEPTH)
+                let check = Array.init iterations (fun _ -> bottomUpTree(depth).itemCheck()) |> Array.sum
+                return sprintf "%d\t trees of depth %d\t check: %d" iterations depth check
+             } |]
         |> Async.Parallel
         |> Async.RunSynchronously
-            
-    for message in messages do
-        printfn "%s" message
-    
+
+    results |> Array.iter (printfn "%s")
+
+    printfn "long lived tree of depth %d\t check: %d" maxDepth (longLivedTree.itemCheck())
     printfn "Elapsed %O" sw.Elapsed
+    Console.ReadLine() |> ignore
     exit 0
