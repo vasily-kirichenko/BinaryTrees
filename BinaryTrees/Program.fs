@@ -1,4 +1,10 @@
-﻿open System
+﻿// The Computer Language Benchmarks Game
+// http://benchmarksgame.alioth.debian.org/
+//
+// Based on Java version by Jarkko Miettinen's
+// Contributed by Vasily Kirichenko
+
+open System
 open System.Threading
 open System.Linq
 open System.Diagnostics
