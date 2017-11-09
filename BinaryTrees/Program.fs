@@ -43,5 +43,4 @@ let main args =
 
     printfn "long lived tree of depth %d\t check: %d" maxDepth (longLivedTree.itemCheck())
     printfn "Elapsed %O" sw.Elapsed
-    Console.ReadLine() |> ignore
     exit 0
