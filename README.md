@@ -24,5 +24,5 @@ stretch tree of depth 22         check: 8388607
 128      trees of depth 18       check: 67108736
 32       trees of depth 20       check: 67108832
 long lived tree of depth 21      check: 4194303
-Elapsed 00:00:12.5967918
+Elapsed 00:00:02.6079709
 ```
