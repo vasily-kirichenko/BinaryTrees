@@ -14,15 +14,13 @@ open System.Threading.Tasks
 type TreeNode(left: TreeNode, right: TreeNode) =
     member this.itemCheck() = if isNull left then 1 else 1 + left.itemCheck() + right.itemCheck()
 
-let empty = TreeNode(null, null)
-
 let MIN_DEPTH = 4
 
 let rec bottomUpTree(depth: int) : TreeNode =
     if depth > 0 then
         TreeNode(bottomUpTree(depth - 1), bottomUpTree(depth - 1))
     else
-        empty
+        TreeNode(null, null)
 
 [<EntryPoint>]
 let main args =
