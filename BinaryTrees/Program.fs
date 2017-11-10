@@ -34,12 +34,13 @@ let main args =
     let longLivedTree = bottomUpTree maxDepth
 
     let results =
-        [| for depth in MIN_DEPTH..2..maxDepth do
-             yield async {
+        Array.init ((maxDepth - MIN_DEPTH)/2) (fun depth ->
+             async {
+                let depth = depth * 2 + MIN_DEPTH
                 let iterations = 1 <<< (maxDepth - depth + MIN_DEPTH)
                 let check = Array.init iterations (fun _ -> bottomUpTree(depth).itemCheck()) |> Array.sum
                 return sprintf "%d\t trees of depth %d\t check: %d" iterations depth check
-             } |]
+             })
         |> Async.Parallel
         |> Async.RunSynchronously
 
