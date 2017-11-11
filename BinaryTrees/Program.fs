@@ -4,14 +4,11 @@
 // Based on Java version by Jarkko Miettinen's
 // Contributed by Vasily Kirichenko
 
-open System
-open System.Diagnostics
-
 [<Sealed; AllowNullLiteral>]
 type TreeNode(left: TreeNode, right: TreeNode) =
-    member this.itemCheck() = if isNull left then 1 else 1 + left.itemCheck() + right.itemCheck()
+    member this.itemCheck() = 
+        if isNull left then 1 else 1 + left.itemCheck() + right.itemCheck()
 
-let MIN_DEPTH = 4
 
 let rec bottomUpTree(depth: int) : TreeNode =
     if depth > 0 then
@@ -22,24 +19,23 @@ let rec bottomUpTree(depth: int) : TreeNode =
 [<EntryPoint>]
 let main args =
     let n = match args with [|n|] -> int n | _ -> 0
-    let maxDepth = if n < MIN_DEPTH + 2 then MIN_DEPTH + 2 else n
+    let minDepth = 4
+    let maxDepth = max (minDepth + 2) n
     let stretchDepth = maxDepth + 1
 
     printfn "stretch tree of depth %d\t check: %d" stretchDepth (bottomUpTree(stretchDepth).itemCheck())
 
     let longLivedTree = bottomUpTree maxDepth
 
-    let results =
-        [| for depth in MIN_DEPTH..2..maxDepth do
-             yield async {
-                let iterations = 1 <<< (maxDepth - depth + MIN_DEPTH)
-                let check = Array.init iterations (fun _ -> bottomUpTree(depth).itemCheck()) |> Array.sum
-                return sprintf "%d\t trees of depth %d\t check: %d" iterations depth check
-             } |]
-        |> Async.Parallel
-        |> Async.RunSynchronously
-
-    results |> Array.iter (printfn "%s")
+    [| for depth in minDepth..2..maxDepth do
+         yield async {
+            let iterations = 1 <<< (maxDepth - depth + minDepth)
+            let check = Array.init iterations (fun _ -> bottomUpTree(depth).itemCheck()) |> Array.sum
+            return sprintf "%d\t trees of depth %d\t check: %d" iterations depth check
+         } |]
+    |> Async.Parallel
+    |> Async.RunSynchronously
+    |> Array.iter (printfn "%s")
 
     printfn "long lived tree of depth %d\t check: %d" maxDepth (longLivedTree.itemCheck())
     0
