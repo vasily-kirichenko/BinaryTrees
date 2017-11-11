@@ -5,10 +5,7 @@
 // Contributed by Vasily Kirichenko
 
 open System
-open System.Threading
-open System.Linq
 open System.Diagnostics
-open System.Threading.Tasks
 
 [<Sealed; AllowNullLiteral>]
 type TreeNode(left: TreeNode, right: TreeNode) =
@@ -24,7 +21,6 @@ let rec bottomUpTree(depth: int) : TreeNode =
 
 [<EntryPoint>]
 let main args =
-    let sw = Stopwatch.StartNew()
     let n = match args with [|n|] -> int n | _ -> 0
     let maxDepth = if n < MIN_DEPTH + 2 then MIN_DEPTH + 2 else n
     let stretchDepth = maxDepth + 1
@@ -46,5 +42,4 @@ let main args =
     results |> Array.iter (printfn "%s")
 
     printfn "long lived tree of depth %d\t check: %d" maxDepth (longLivedTree.itemCheck())
-    printfn "Elapsed %O" sw.Elapsed
-    exit 0
+    0
